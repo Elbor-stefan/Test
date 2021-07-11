@@ -4,103 +4,121 @@
 
 #define LIMITE_N_CONSECUTIVOS 5
 #define LIMITE_N_ITERACION 3
+#define BASE2 2
 
-/**regresa la incognita X**/
-int obtenerConsecutivoInicial(int, int);
+int obtenerConsecutivo(int, int);
 void mostrarOperacion(int, int);
 
-int main(/**int argc, char** argv**/)
+int main()
 {
-    int numeroEntero, numerosConsecutivos, resultadoDeLaIncognita;
-    double numeroDeDoblePresicion, errorDePresicion;
+    int numero, nConsecutivo, incognita;
+    double dnumero, error;
 
-    numeroEntero = 0;
-    numeroDeDoblePresicion = 0.0;
-    errorDePresicion = 0.0;
+    numero  = 0;
+    dnumero = 0.0;
+    error   = 0.0;
 
     printf("Ingrese un numero: " );
     fflush(stdin);
-    scanf( "%lf", &numeroDeDoblePresicion );
+    scanf( "%lf", &dnumero );
 
-    numeroEntero = numeroDeDoblePresicion;
-    errorDePresicion = fabs(numeroEntero - numeroDeDoblePresicion);
+    numero  = dnumero;
+    error   = fabs(numero - dnumero);
 
-    if ( errorDePresicion > 0.001 )
+    if ( error > 0.001 )
     {
         printf( "Error de entrada!!!\n" );
+        system("PAUSE");
+
+        return(0);
     }
-    else
+
+    int exp =0;
+    exp = (int) roundl((logl(numero) / logl(BASE2)));
+    if (numero == (1 << exp))
     {
-        /** (2^n| n>0) no muestra resultados **/
-        numerosConsecutivos = 2;
-        resultadoDeLaIncognita = 0;
-        while (resultadoDeLaIncognita != -1)
+        /** (2^n | n>0) **/
+        printf("2^n\n");
+        system("PAUSE");
+
+        return(0);
+    };
+
+    nConsecutivo = 2;
+    incognita = 0;
+    while (incognita != -1)
+    {
+        incognita = obtenerConsecutivo(nConsecutivo, numero);
+
+        if (incognita > 0)
         {
-            resultadoDeLaIncognita =
-                obtenerConsecutivoInicial(numerosConsecutivos, numeroEntero);
-
-            if (resultadoDeLaIncognita > 0)
-                mostrarOperacion(resultadoDeLaIncognita, numerosConsecutivos);
-
-            numerosConsecutivos += 1;
+            mostrarOperacion(incognita, nConsecutivo);
         }
+
+        nConsecutivo += 1;
     }
 
     system("PAUSE");
     return (0);
 }
 
-int obtenerConsecutivoInicial(int numerosConsecutivos, int numeroACalcular)
+int obtenerConsecutivo(int nConsecutivo, int numeroACalcular)
 {
-    int sumaDeConsecutivos, variableTemporal, resultado;
-    variableTemporal = 0;
-    /*x0+0+x1+1+xn+n=i*/
-    /* formula (n(n+1))/2 */
-    sumaDeConsecutivos = numerosConsecutivos;
-    sumaDeConsecutivos -= 1;
-    sumaDeConsecutivos *= numerosConsecutivos;
-    sumaDeConsecutivos /= 2;
+    int sumConsecutivo, temp, resultado;
+    temp = 0;
 
-    /**Desbordamiento**/
-    if (sumaDeConsecutivos <= -1)
+    sumConsecutivo = nConsecutivo;
+    sumConsecutivo -= 1;
+
+    sumConsecutivo *= nConsecutivo;
+    sumConsecutivo /= 2;
+
+    /** Desbordamiento **/
+    if (sumConsecutivo <= -1)
         return (-1);
 
-    resultado = (numeroACalcular - sumaDeConsecutivos);
+    resultado = (numeroACalcular - sumConsecutivo);
 
-    /**Desbordamiento**/
+    /** Desbordamiento **/
     if (resultado <= 0)
         return (-1);
 
-    variableTemporal = (resultado % numerosConsecutivos);
+    temp = (resultado % nConsecutivo);
 
-    /**No divisible**/
-    if (variableTemporal != 0)
+    /** No divisible (residuo) **/
+    if (temp != 0)
         return (0);
 
-    variableTemporal = (resultado / numerosConsecutivos);
-    return (variableTemporal);
+    temp = (resultado / nConsecutivo);
+    return (temp);
 }
 
-void mostrarOperacion(int resultadoDeLaIncognita, int numerosConsecutivos)
+void mostrarOperacion(int vIncognita, int nConsecutivo)
 {
-    int resultadoFinal, contador, nIteracion, temp;
-    resultadoFinal = 0;
+    int contador, nIteracion;
+    long double resultadoFinal, temp;
 
-    printf("%d ", resultadoDeLaIncognita);
-    temp = resultadoDeLaIncognita;
-    
-    nIteracion = (numerosConsecutivos > LIMITE_N_CONSECUTIVOS)? LIMITE_N_ITERACION : numerosConsecutivos;
+    resultadoFinal  =0.0;
+    temp            =0.0;
+
+    printf("%d ", vIncognita);
+    temp = vIncognita;
+
+    nIteracion = (nConsecutivo > LIMITE_N_CONSECUTIVOS)
+        ? LIMITE_N_ITERACION
+        : nConsecutivo;
 
     for (contador = 1; (contador < nIteracion); contador++)
     {
         temp += 1;
-        printf("+ %d ", temp);
+        printf("+ %.0lf ", temp);
     }
 
-    temp = (resultadoDeLaIncognita + (numerosConsecutivos -1));
-    resultadoFinal = (((resultadoDeLaIncognita + temp) * ((temp - resultadoDeLaIncognita) + 1)) / 2);
+    temp = (vIncognita + (nConsecutivo -1));
+    resultadoFinal = ((vIncognita + temp) / 2);
+    resultadoFinal = (resultadoFinal * ((temp - vIncognita) + 1));
 
-    (numerosConsecutivos > LIMITE_N_CONSECUTIVOS) ? 
-        printf("+ ... + %d = %d\n", temp, resultadoFinal) : 
-        printf("= %d\n", resultadoFinal);
+    (nConsecutivo > LIMITE_N_CONSECUTIVOS) ?
+        printf("+ ... + %.0lf = %.0lf\n", temp, resultadoFinal) :
+        printf("= %.0lf\n", resultadoFinal);
 }
